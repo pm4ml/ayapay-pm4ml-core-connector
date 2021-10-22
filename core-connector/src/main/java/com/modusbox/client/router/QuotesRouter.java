@@ -54,7 +54,7 @@ public class QuotesRouter extends RouteBuilder {
 				.marshal().json()
 
 				// Add CORS headers
-				.process(corsFilter)
+//				.process(corsFilter)
 
 				/*
 				 * END processing

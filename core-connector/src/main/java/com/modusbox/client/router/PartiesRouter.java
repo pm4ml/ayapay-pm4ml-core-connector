@@ -2,6 +2,7 @@ package com.modusbox.client.router;
 
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.CorsFilter;
+import com.modusbox.client.processor.EncodeAuthHeader;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.camel.Exchange;
@@ -12,6 +13,7 @@ public class PartiesRouter extends RouteBuilder {
 
 	private final RouteExceptionHandlingConfigurer exception = new RouteExceptionHandlingConfigurer();
 	private final CorsFilter corsFilter = new CorsFilter();
+	private final EncodeAuthHeader encodeAuthHeader = new EncodeAuthHeader();
 
 	// Prometheus metrics for GET /parties/{idType}/{idValue}
 	private static final String ROUTE_ID = "com.modusbox.getPartiesByIdTypeIdValue";
@@ -60,21 +62,37 @@ public class PartiesRouter extends RouteBuilder {
 				/*
 				 * BEGIN processing
 				 */
-				.setBody(simple("{}"))
+
+				// Get Authorization header
+				.to("direct:postGetAyapayAcessToken")
+				.to("direct:postAyapayLogin")
+//.process(exchange -> System.out.println())
+				.setHeader("Token", simple("Bearer ${exchangeProperty.ayapayAccessToken}"))
+				.setHeader("Authorization", simple("Bearer ${exchangeProperty.ayapayRefreshToken}"))
+//.process(exchange -> System.out.println())
+
+				.setBody(simple("{\"phone\": \"${header.idValue}\"}"))
 				.removeHeaders("CamelHttp*")
 				.removeHeader(Exchange.HTTP_URI)
 				.setHeader("Content-Type", constant("application/json"))
 				.setHeader("Accept", constant("application/json"))
-				.setHeader(Exchange.HTTP_METHOD, constant("GET"))
+				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Calling backend API, getParties', " +
 						"'Tracking the request', 'Track the response', " +
-						"'Request sent to, GET {{backend.endpoint}}/parties/${header.idType}/${header.idValue}')")
-				.toD("{{backend.endpoint}}/parties/${header.idType}/${header.idValue}?bridgeEndpoint=true&throwExceptionOnFailure=false")
-				.unmarshal().json(JsonLibrary.Gson)
+						"'Request sent to, POST {{dfsp.host}}/{{dfsp.api-version}}/user/checkPhone')")
+//.process(exchange -> System.out.println())
+				.toD("{{dfsp.host}}/{{dfsp.api-version}}/user/checkPhone?bridgeEndpoint=true")
+//				.unmarshal().json()
+//
+//				.marshal().json()
+				.transform(datasonnet("resource:classpath:mappings/getPartiesResponse.ds"))
+				.setBody(simple("${body.content}"))
+				.marshal().json()
 
 				// Add CORS headers
-				.process(corsFilter)
+//				.process(corsFilter)
 
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Response from backend API, getParties: ${body}', " +
@@ -108,9 +126,9 @@ public class PartiesRouter extends RouteBuilder {
 				.to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
 						"'Calling backend API, getParties', " +
 						"'Tracking the request', 'Track the response', " +
-						"'Request sent to, GET {{backend.endpoint}}/parties/${header.idType}/${header.idValue}/${header.idSubValue}')")
-				.toD("{{backend.endpoint}}/parties/${header.idType}/${header.idValue}/${header.idSubValue}?bridgeEndpoint=true&throwExceptionOnFailure=false")
-				.unmarshal().json(JsonLibrary.Gson)
+						"'Request sent to, GET {{dfsp.host}}/parties/${header.idType}/${header.idValue}/${header.idSubValue}')")
+				.toD("{{dfsp.host}}/parties/${header.idType}/${header.idValue}/${header.idSubValue}?bridgeEndpoint=true&throwExceptionOnFailure=false")
+				.unmarshal().json()
 
 				// Add CORS headers
 				.process(corsFilter)

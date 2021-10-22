@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>com.modusbox</groupId>
-        <artifactId>wallet-core-connector</artifactId>
+        <artifactId>ayapay-core-connector</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>core-connector</artifactId>
-    <name>Wallet core connector :: Parent</name>
+    <name>Ayapay core connector :: Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

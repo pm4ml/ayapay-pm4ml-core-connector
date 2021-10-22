@@ -27,6 +27,7 @@
     <bean id="healthRouter" class="com.modusbox.client.router.HealthRouter" />
     <bean id="customJsonMessage" class="com.modusbox.log4j2.message.CustomJsonMessageImpl" />
     <bean id="customErrorRouter" class="com.modusbox.client.router.CustomErrorRouter" />
+    <bean id="authRouter" class="com.modusbox.client.router.AuthRouter" />
     <bean id="corsFilter" class="org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter" />
 
     <camel:camelContext>
@@ -37,6 +38,7 @@
         <camel:routeBuilder ref="transfersRouter"/>
         <camel:routeBuilder ref="sendMoneyRouter"/>
         <camel:routeBuilder ref="healthRouter"/>
+        <camel:routeBuilder ref="authRouter"/>
         <camel:routeBuilder ref="customErrorRouter"/>
     </camel:camelContext>
 

@@ -35,7 +35,7 @@ public class CustomErrorProcessor implements Processor {
                 String errorMessage = "Downstream API failed.";
                 String detailedDescription = "Unknown";
                 try {
-                    if (null != e.getResponseBody()) {
+                    if ((null != e.getResponseBody()) && !("".equals(e.getResponseBody()))) {
                         /* Below if block needs to be changed as per the error object structure specific to 
                             CBS back end API that is being integrated in Core Connector. */
 

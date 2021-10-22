@@ -1,7 +1,11 @@
 {
   "amount": payload.amount,
-  [if (std.objectHas(payload, "transferId") && payload.transferId != null)
-   then "externalId"]: payload.transferId,
+  "currency": payload.currency,
+  "receiverPhone": payload.to.idValue,
+//  [if (std.objectHas(payload, "transferId") && payload.transferId != null)
+//   then "externalId"]: payload.transferId,
   [if (std.objectHas(payload, "note") && payload.note != null)
-   then "note"]: payload.note
+   then "message"]: payload.note,
+  "messageType": "FO",
+  "serviceId": "6107ce5e8d1d0b8848989f31"
 }

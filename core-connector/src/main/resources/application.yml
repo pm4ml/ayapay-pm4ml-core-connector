@@ -3,7 +3,7 @@ spring:
     active: local
 
 server:
-  port: 9097
+  port: 9091
   metrics:
     port: 7001
   api:
@@ -14,17 +14,24 @@ server:
 
 camel:
   component: jetty
-
   springboot:
     main-run-controller: true
-    name: wallet-core-connector
+    name: ayapay-pm4ml-core-connector
     stream-caching-enabled: true
 
-#informed through runtime variable (java -Dbackend.endpoint=http://localhost:3000)
-backend:
-  endpoint: http://localhost:3000
+### IMPORTANT: the below properties are here for development reference purpose
+### for the cluster usage (Helm Chart) it are being set through system variable
+### (java -Ddfsp.host=... -Ddfsp.username=... -jar core-connector.jar) into Dockerfile
 
-#informed through runtime variable (java -Doutbound.endpoint=http://localhost:3003)
-outbound:
-#  endpoint:  http://localhost:3003
-  endpoint:   http://localhost:4001
+### properties for DFSP connection
+dfsp:
+  host: https://localhost/api
+  username: user
+  password: pass
+  api-key: key
+  api-version: v1
+
+### properties for Mojaloop Connector connection
+ml-conn:
+  outbound:
+    host:  http://localhost:4001

@@ -1,3 +1,8 @@
+//{
+//  "err": 9001,
+//  "message": "Transaction not found"
+//}
 {
-  homeTransactionId: payload.id
+  [if (std.objectHas(payload.data.transaction, "transRefId") && payload.data.transaction.transRefId != null)
+   then "homeTransactionId"]: payload.data.transaction.transRefId
 }

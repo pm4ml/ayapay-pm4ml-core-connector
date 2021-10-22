@@ -56,15 +56,64 @@ public class TransfersRouter extends RouteBuilder {
                  * BEGIN processing
                  */
                 .setProperty("origPayload", simple("${body}"))
+
+                .to("direct:postGetAyapayAcessToken")
+                .to("direct:postAyapayLogin")
+//.process(exchange -> System.out.println())
+                .setHeader("Token", simple("Bearer ${exchangeProperty.ayapayAccessToken}"))
+                .setHeader("Authorization", simple("Bearer ${exchangeProperty.ayapayRefreshToken}"))
+
+                .setBody(simple("${exchangeProperty.origPayload}"))
                 .removeHeaders("CamelHttp*")
-                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .removeHeader(Exchange.HTTP_URI)
                 .setHeader("Content-Type", constant("application/json"))
+                .setHeader("Accept", constant("application/json"))
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+//.process(exchange -> System.out.println())
+                .marshal().json()
+                .transform(datasonnet("resource:classpath:mappings/postTransfersRequest.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Calling backend API, postTransfers, POST {{backend.endpoint}}', " +
+                        "'Calling backend API, postTransfers, POST {{dfsp.host}}/{{dfsp.api-version}}/transaction/requestTransaction', " +
                         "'Tracking the request', 'Track the response', 'Input Payload: ${body}')")
-                .marshal().json(JsonLibrary.Gson)
-                .toD("{{backend.endpoint}}/transfers?bridgeEndpoint=true&throwExceptionOnFailure=false")
-                .unmarshal().json(JsonLibrary.Gson)
+                // POST the transaction
+//.process(exchange -> System.out.println())
+                .toD("{{dfsp.host}}/{{dfsp.api-version}}/transaction/requestTransaction?bridgeEndpoint=true")
+                .unmarshal().json()
+//.process(exchange -> System.out.println())
+                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                        "'Response from backend API, requestTransaction: ${body}', " +
+                        "'Tracking the response', 'Verify the response', null)")
+
+                // Verify it got reflected in CBS
+                .removeHeaders("CamelHttp*")
+                .removeHeader(Exchange.HTTP_URI)
+                .setHeader("Content-Type", constant("application/json"))
+                .setHeader("Accept", constant("application/json"))
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+
+                .setHeader("Token", simple("Bearer ${exchangeProperty.ayapayAccessToken}"))
+                .setHeader("Authorization", simple("Bearer ${exchangeProperty.ayapayRefreshToken}"))
+
+                .marshal().json()
+                .transform(datasonnet("{\"transRefId\": payload.data.transRefId, \"messageType\": \"FO\"}"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+
+                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                        "'Calling backend API, postTransfers, POST {{dfsp.host}}/{{dfsp.api-version}}/transaction/verifyTransaction', " +
+                        "'Tracking the request', 'Track the response', 'Input Payload: ${body}')")
+                .toD("{{dfsp.host}}/{{dfsp.api-version}}/transaction/verifyTransaction?bridgeEndpoint=true")
+                .unmarshal().json()
+//.process(exchange -> System.out.println())
+
+                .marshal().json()
+                .transform(datasonnet("resource:classpath:mappings/postTransfersResponse.ds"))
+                .setBody(simple("${body.content}"))
+                .marshal().json()
+
                 .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
                         "'Response from backend API, postTransfers: ${body}', " +
                         "'Tracking the response', 'Verify the response', null)")

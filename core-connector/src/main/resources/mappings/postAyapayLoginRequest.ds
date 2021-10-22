@@ -1,0 +1,5 @@
+{
+  "organizationId": cml.properties('dfsp.login.organizationId'),
+  "organizationName": cml.properties('dfsp.login.organizationName'),
+  "password": cml.properties('dfsp.login.password'),
+}

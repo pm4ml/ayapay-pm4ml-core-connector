@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.modusbox</groupId>
-        <artifactId>wallet-core-connector</artifactId>
+        <artifactId>ayapay-core-connector</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
