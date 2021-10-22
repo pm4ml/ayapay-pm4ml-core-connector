@@ -7,18 +7,13 @@ COPY ${JAR_FILE} app.jar
 ENV MLCONN_OUTBOUND_ENDPOINT=http://simulator:3004
 ENV DFSP_NAME="DFSP CO. LTD."
 ENV DFSP_HOST="https://localhost/api"
-ENV DFSP_USERNAME=username
-ENV DFSP_PASSWORD=password
-ENV DFSP_AUTH_CLIENT_ID=clientId
-ENV DFSP_AUTH_CLIENT_SECRET=clientSecret
-ENV DFSP_AUTH_GRANT_TYPE=grantType
-ENV DFSP_AUTH_SCOPE=scope
-ENV DFSP_AUTH_ENCRYPTED_PASS=false
-ENV DFSP_AUTH_TENANT_ID=tenantId
-ENV DFSP_AUTH_CHANNEL_ID=channelId
-ENV DFSP_AUTH_API_KEY=apiKey
-ENV DFSP_API_VERSION=v1
+ENV DFSP_USERNAME="username"
+ENV DFSP_PASSWORD="password"
+ENV DFSP_API_VERSION="v1"
+ENV DFSP_LOGIN_ORGANIZATIONID="123"
+ENV DFSP_LOGIN_ORGANIZATIONNAME="dfsp name"
+ENV DFSP_LOGIN_PASSWORD="password"
 
-ENTRYPOINT ["java", "-Dml-conn.outbound.host=${MLCONN_OUTBOUND_ENDPOINT}", "-Ddfsp.name=${DFSP_NAME}", "-Ddfsp.host=${DFSP_HOST}", "-Ddfsp.username=${DFSP_USERNAME}", "-Ddfsp.password=${DFSP_PASSWORD}", "-Ddfsp.scope=${DFSP_AUTH_SCOPE}", "-Ddfsp.client-id=${DFSP_AUTH_CLIENT_ID}", "-Ddfsp.client-secret=${DFSP_AUTH_CLIENT_SECRET}", "-Ddfsp.grant-type=${DFSP_AUTH_GRANT_TYPE}", "-Ddfsp.is-password-encrypted=${DFSP_AUTH_ENCRYPTED_PASS}", "-Ddfsp.tenant-id=${DFSP_AUTH_TENANT_ID}", "-Ddfsp.channel-id=${DFSP_AUTH_CHANNEL_ID}", "-Ddfsp.api-key=${DFSP_AUTH_API_KEY}", "-Ddfsp.api-version=${DFSP_API_VERSION}","-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Dml-conn.outbound.host=${MLCONN_OUTBOUND_ENDPOINT}", "-Ddfsp.name=${DFSP_NAME}", "-Ddfsp.host=${DFSP_HOST}", "-Ddfsp.username=${DFSP_USERNAME}", "-Ddfsp.password=${DFSP_PASSWORD}", -Ddfsp.api.version=${DFSP_API_VERSION}, -Ddfsp.login.organizationId=${DFSP_LOGIN_ORGANIZATIONID}, -Ddfsp.login.organizationName=${ENV DFSP_LOGIN_ORGANIZATIONNAME}, -Ddfsp.login.password=${ENV DFSP_LOGIN_PASSWORD}","-jar", "/app.jar"]
 
 EXPOSE 3003
