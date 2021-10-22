@@ -1,5 +1,6 @@
-local displayName = payload.data.name;
-local lastName = payload.data.name;
+local firstName = "";
+local lastName = ds.replace(payload.data.name, @"/", " ");
+local displayName = firstName + lastName;
 
 {
   type: "BUSINESS",
