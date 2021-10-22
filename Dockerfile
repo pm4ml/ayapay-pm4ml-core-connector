@@ -14,6 +14,6 @@ ENV DFSP_LOGIN_ORGANIZATIONID="123"
 ENV DFSP_LOGIN_ORGANIZATIONNAME="dfsp name"
 ENV DFSP_LOGIN_PASSWORD="password"
 
-ENTRYPOINT ["java", "-Dml-conn.outbound.host=${MLCONN_OUTBOUND_ENDPOINT}", "-Ddfsp.name=${DFSP_NAME}", "-Ddfsp.host=${DFSP_HOST}", "-Ddfsp.username=${DFSP_USERNAME}", "-Ddfsp.password=${DFSP_PASSWORD}", -Ddfsp.api.version=${DFSP_API_VERSION}, -Ddfsp.login.organizationId=${DFSP_LOGIN_ORGANIZATIONID}, -Ddfsp.login.organizationName=${ENV DFSP_LOGIN_ORGANIZATIONNAME}, -Ddfsp.login.password=${ENV DFSP_LOGIN_PASSWORD}","-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Dml-conn.outbound.host=${MLCONN_OUTBOUND_ENDPOINT}", "-Ddfsp.name=${DFSP_NAME}", "-Ddfsp.host=${DFSP_HOST}", "-Ddfsp.username=${DFSP_USERNAME}", "-Ddfsp.password=${DFSP_PASSWORD}", "-Ddfsp.api.version=${DFSP_API_VERSION}", "-Ddfsp.login.organizationId=${DFSP_LOGIN_ORGANIZATIONID}", "-Ddfsp.login.organizationName=${DFSP_LOGIN_ORGANIZATIONNAME}", "-Ddfsp.login.password=${DFSP_LOGIN_PASSWORD}","-jar", "/app.jar"]
 
 EXPOSE 3003
