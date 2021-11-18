@@ -3,6 +3,7 @@ package com.modusbox.client.router;
 import com.modusbox.client.exception.RouteExceptionHandlingConfigurer;
 import com.modusbox.client.processor.CorsFilter;
 import com.modusbox.client.processor.EncodeAuthHeader;
+import com.modusbox.client.processor.TokenStore;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -32,25 +33,35 @@ public class AuthRouter extends RouteBuilder {
 //                .setHeader("Content-Type", constant("application/json"))
 //                .setHeader("Accept", constant("application/json"))
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                // Set Authorization header for basic auth mechanism
-                .setProperty("authHeader", simple("${properties:dfsp.username}:${properties:dfsp.password}"))
-                .process(encodeAuthHeader)
-//.process(exchange -> System.out.println())
-                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Calling backend API, get access token', " +
-                        "'Tracking the request', 'Track the response', " +
-                        "'Request sent to, POST {{dfsp.host}}/token?grant_type=client_credentials')")
-                .toD("{{dfsp.host}}/token?grant_type=client_credentials&bridgeEndpoint=true")
-//                .toD("https://yordan.free.beeceptor.com/token?grant_type=client_credentials&bridgeEndpoint=true")
-                .unmarshal().json()
-                .setProperty("ayapayAccessToken", simple("${body['access_token']}"))
-//.process(exchange -> System.out.println())
-                // Add CORS headers
-//				.process(corsFilter)
 
-                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Response from backend API, get access token', " +
-                        "'Tracking the response', 'Verify the response', null)")
+                .setProperty("ayapayAccessToken", method(TokenStore.class, "getAccessToken()"))
+
+                .choice()
+                    .when(method(TokenStore.class, "getAccessToken()").isEqualTo(""))
+                        // Set Authorization header for basic auth mechanism
+                        .setProperty("authHeader", simple("${properties:dfsp.username}:${properties:dfsp.password}"))
+                        .process(encodeAuthHeader)
+                        .process(exchange -> System.out.println())
+                        .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                                "'Calling backend API, get access token', " +
+                                "'Tracking the request', 'Track the response', " +
+                                "'Request sent to, POST {{dfsp.host}}/token?grant_type=client_credentials')")
+                        .toD("{{dfsp.host}}/token?grant_type=client_credentials&bridgeEndpoint=true")
+        //                .toD("https://yordan.free.beeceptor.com/token?grant_type=client_credentials&bridgeEndpoint=true")
+                        .unmarshal().json()
+                        .setProperty("ayapayAccessToken", simple("${body['access_token']}"))
+                        .setProperty("ayapayAccessTokenExpiration", simple("${body['expires_in']}"))
+                        .bean(TokenStore.class, "setAccessToken(${exchangeProperty.ayapayAccessToken}, ${exchangeProperty.ayapayAccessTokenExpiration})")
+                        .process(exchange -> System.out.println())
+
+                        // Add CORS headers
+        //				.process(corsFilter)
+
+                        .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                                "'Response from backend API, get access token', " +
+                                "'Tracking the response', 'Verify the response', null)")
+                .end()
+
                 /*
                  * END processing
                  */
@@ -75,27 +86,39 @@ public class AuthRouter extends RouteBuilder {
                 // Set Token header for auth mechanism
                 .setHeader("Token", simple("Bearer ${exchangeProperty.ayapayAccessToken}"))
 //.process(exchange -> System.out.println())
-                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Calling backend API, login', " +
-                        "'Tracking the request', 'Track the response', " +
-                        "'Request sent to, POST {{dfsp.host}}/token?grant_type=client_credentials')")
 
-                // Set body
-                .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/postAyapayLoginRequest.ds"))
-                .setBody(simple("${body.content}"))
-                .marshal().json()
+                .setProperty("ayapayRefreshToken", method(TokenStore.class, "getRefreshToken()"))
 
-                .toD("{{dfsp.host}}/{{dfsp.api-version}}/user/login?bridgeEndpoint=true")
-                .unmarshal().json()
-                .setProperty("ayapayRefreshToken", simple("${body['data']['token']}"))
-//.process(exchange -> System.out.println())
-                // Add CORS headers
-//				.process(corsFilter)
+                .choice()
+//                  .when(simple("${exchangeProperty.ayapayRefreshToken} == ''"))
+//                  .when(exchangeProperty("ayapayRefreshToken").isEqualTo(""))
+                    .when(method(TokenStore.class, "getRefreshToken()").isEqualTo(""))
+                        .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                            "'Calling backend API, login', " +
+                            "'Tracking the request', 'Track the response', " +
+                            "'Request sent to, POST {{dfsp.host}}/user/login')")
 
-                .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
-                        "'Response from backend API, login', " +
-                        "'Tracking the response', 'Verify the response', null)")
+                        // Set body
+                        .marshal().json()
+                        .transform(datasonnet("resource:classpath:mappings/postAyapayLoginRequest.ds"))
+                        .setBody(simple("${body.content}"))
+                        .marshal().json()
+
+                        .toD("{{dfsp.host}}/{{dfsp.api-version}}/user/login?bridgeEndpoint=true")
+                        .unmarshal().json()
+                        .process(exchange -> System.out.println())
+                        .setProperty("ayapayRefreshToken", simple("${body['data']['token']}"))
+                        .setProperty("ayapayRefreshTokenExpiration", simple("${body['data']['expiredAt']}"))
+                        .bean(TokenStore.class, "setRefreshToken(${exchangeProperty.ayapayRefreshToken}, ${exchangeProperty.ayapayRefreshTokenExpiration})")
+                        .process(exchange -> System.out.println())
+                        // Add CORS headers
+        //				.process(corsFilter)
+
+                        .to("bean:customJsonMessage?method=logJsonMessage('info', ${header.X-CorrelationId}, " +
+                                "'Response from backend API, login', " +
+                                "'Tracking the response', 'Verify the response', null)")
+                .end()
+
                 /*
                  * END processing
                  */

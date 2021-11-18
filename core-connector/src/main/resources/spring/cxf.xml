@@ -44,6 +44,7 @@
 
     <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
     <bean id="globalExceptionMapper" class="com.modusbox.client.exception.GlobalExceptionMapper"/>
+    <bean id="tokenStore" class="com.modusbox.client.processor.TokenStore"/>
 
     <camelcxf:rsServer
             id="api-rs-server"

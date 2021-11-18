@@ -15,7 +15,7 @@ public final class CustomErrorRouter extends RouteBuilder {
         ;
 
         from("direct:catchCBSError")
-.process(exchange -> System.out.println())
+//.process(exchange -> System.out.println())
             .process(checkCBSError)
         ;
     }
