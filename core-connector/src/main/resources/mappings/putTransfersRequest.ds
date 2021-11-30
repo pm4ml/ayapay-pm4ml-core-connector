@@ -1,13 +1,1 @@
-local data = payload.quote.internalRequest;
-
-{
-  "amount": data.amount,
-  "currency": data.currency,
-  "receiverPhone": data.to.idValue,
-  //  [if (std.objectHas(payload, "transferId") && payload.transferId != null)
-  //   then "externalId"]: payload.transferId,
-  [if (std.objectHas(data, "note") && data.note != null)
-   then "message"]: data.note,
-  "messageType": "FO",
-  "serviceId": "6107ce5e8d1d0b8848989f31"
-}
+std.prune(payload)

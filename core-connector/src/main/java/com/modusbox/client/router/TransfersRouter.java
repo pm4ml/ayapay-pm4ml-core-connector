@@ -106,7 +106,7 @@ public class TransfersRouter extends RouteBuilder {
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
 //.process(exchange -> System.out.println())
                 .marshal().json()
-                .transform(datasonnet("resource:classpath:mappings/putTransfersRequest.ds"))
+                .transform(datasonnet("resource:classpath:mappings/ayapayRequestTransaction.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
 
