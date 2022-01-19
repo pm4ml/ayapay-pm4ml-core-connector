@@ -93,7 +93,7 @@ public class CustomErrorProcessor implements Processor {
                     statusCode = String.valueOf(errorResponse.getInt("statusCode"));
                     errorMessage = errorResponse.getString("description");
                     reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
-                                    "\"message\": \"" + errorMessage +
+                                    "\"message\": \"" + errorMessage +  "\"," +
                                     "\"localeMessage\": \"" + errorMessageLocale + "\"," +
                                     "\"detailedDescription\": \"" +   detailedDescription + "\"" +
                             "\"} ";
