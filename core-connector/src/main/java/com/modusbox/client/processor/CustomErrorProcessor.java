@@ -29,6 +29,7 @@ public class CustomErrorProcessor implements Processor {
         String errorMessage = "Downstream API failed.";
         String detailedDescription = "Unknown";
         int httpResponseCode = 500;
+        String errorMessageLocale ="သင် ပေးချေလိုသော စာရင်း မရှိပါ။";
 
         JSONObject errorResponse = new JSONObject(ErrorCode.getErrorResponse(ErrorCode.GENERIC_DOWNSTREAM_ERROR_PAYEE));;
 
@@ -71,6 +72,7 @@ public class CustomErrorProcessor implements Processor {
                     reasonText = "{" +
                             "\"statusCode\": \"" + statusCode + "\"," +
                             "\"message\": \"" + errorMessage + "\"," +
+                            "\"localeMessage\": \"" + errorMessageLocale + "\"," +
                             "\"detailedDescription\": \"" + detailedDescription + "\"" +
                             "}";
                 }
@@ -91,7 +93,10 @@ public class CustomErrorProcessor implements Processor {
                     statusCode = String.valueOf(errorResponse.getInt("statusCode"));
                     errorMessage = errorResponse.getString("description");
                     reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
-                            "\"message\": \"" + errorMessage + "\"} ";
+                                    "\"message\": \"" + errorMessage +  "\"," +
+                                    "\"localeMessage\": \"" + errorMessageLocale + "\"," +
+                                    "\"detailedDescription\": \"" +   detailedDescription + "\"" +
+                            "\"} ";
                 }
             }
             customJsonMessage.logJsonMessage("error", String.valueOf(exchange.getIn().getHeader("X-CorrelationId")),
