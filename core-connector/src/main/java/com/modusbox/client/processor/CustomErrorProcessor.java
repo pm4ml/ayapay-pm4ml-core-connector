@@ -96,7 +96,7 @@ public class CustomErrorProcessor implements Processor {
                                     "\"message\": \"" + errorMessage +  "\"," +
                                     "\"localeMessage\": \"" + errorMessageLocale + "\"," +
                                     "\"detailedDescription\": \"" +   detailedDescription + "\"" +
-                            "\"} ";
+                            "} ";
                 }
             }
             customJsonMessage.logJsonMessage("error", String.valueOf(exchange.getIn().getHeader("X-CorrelationId")),
