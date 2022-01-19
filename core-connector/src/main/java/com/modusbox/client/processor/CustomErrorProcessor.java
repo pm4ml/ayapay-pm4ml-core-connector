@@ -99,11 +99,12 @@ public class CustomErrorProcessor implements Processor {
                             "} ";
                 }
             }
+
             customJsonMessage.logJsonMessage("error", String.valueOf(exchange.getIn().getHeader("X-CorrelationId")),
                     "Processing the exception at CustomErrorProcessor", null, null,
                     exception.getMessage());
         }
-
+        System.out.println("Reason Text: " + reasonText);
         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, httpResponseCode);
         exchange.getMessage().setHeader(Exchange.CONTENT_TYPE, "application/json");
         exchange.getMessage().setBody(reasonText);
