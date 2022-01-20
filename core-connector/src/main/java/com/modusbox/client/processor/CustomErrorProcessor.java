@@ -94,8 +94,8 @@ public class CustomErrorProcessor implements Processor {
                     errorMessage = errorResponse.getString("description");
                     reasonText = "{ \"statusCode\": \"" + statusCode + "\"," +
                                     "\"message\": \"" + errorMessage +  "\"," +
-                                    "\"localeMessage\": \"" + errorMessageLocale + "\"," +
-                                    "\"detailedDescription\": \"" +   detailedDescription + "\"" +
+                                    "\"localeMessage\": \"" + errorMessageLocale + "\"" + // + "\"," +
+//                                    "\"detailedDescription\": \"" +   detailedDescription + "\"" +
                             "} ";
                 }
             }
@@ -104,7 +104,7 @@ public class CustomErrorProcessor implements Processor {
                     "Processing the exception at CustomErrorProcessor", null, null,
                     exception.getMessage());
         }
-        System.out.println("Reason Text: " + reasonText);
+        System.out.println("Erro reason text: " + reasonText);
         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, httpResponseCode);
         exchange.getMessage().setHeader(Exchange.CONTENT_TYPE, "application/json");
         exchange.getMessage().setBody(reasonText);

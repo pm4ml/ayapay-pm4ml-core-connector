@@ -116,7 +116,7 @@
 
 
             <!-- logging -->
-            <!-- vulnerability in log4j found, need to use only version 2.15.0 or above!!! -->
+            <!-- vulnerability in log4j found, need to use only version 2.17.0 or above!!! -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>

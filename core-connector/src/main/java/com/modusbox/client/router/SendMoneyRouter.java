@@ -32,7 +32,7 @@ public class SendMoneyRouter extends RouteBuilder {
             .register();
 
     private final RouteExceptionHandlingConfigurer exceptionHandlingConfigurer = new RouteExceptionHandlingConfigurer();
-    private final CorsFilter corsFilter = new CorsFilter();
+//    private final CorsFilter corsFilter = new CorsFilter();
 
     public void configure() {
         // Add our global exception handling strategy
@@ -139,7 +139,7 @@ public class SendMoneyRouter extends RouteBuilder {
                         "'Tracking the response', 'Verify the response', null)")
 
                 // Add CORS headers
-                .process(corsFilter)
+//                .process(corsFilter)
 
                 .process(exchange -> {
                     ((Histogram.Timer) exchange.getProperty(TIMER_NAME_PUT)).observeDuration(); // stop Prometheus Histogram metric
@@ -156,7 +156,7 @@ public class SendMoneyRouter extends RouteBuilder {
 
                 // Conditional whether errorMessage was found
                 .choice()
-                    .when(simple("${body.get('statusCode')} == '3241'"))
+                    .when(simple("${body.get('statusCode')} == '3242'"))
                         .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(409))
                 .end()
         ;
