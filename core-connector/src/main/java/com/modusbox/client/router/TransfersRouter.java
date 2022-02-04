@@ -89,10 +89,22 @@ public class TransfersRouter extends RouteBuilder {
                         "'Tracking the response', 'Verify the response', null)")
 //                .process(exchange -> System.out.println())
 
+                .choice()
+                .when(simple("${body['statusCode']} != null"))
+//                .process(exchange -> System.out.println())
+                    .to("direct:catchMojaloopError")
+                .endDoTry()
+
+//                .process(exchange -> System.out.println())
+
+                .choice()
+                .when(simple("${body['fulfil']} != null"))
+//                .process(exchange -> System.out.println())            
                 .marshal().json()
                 .transform(datasonnet("resource:classpath:mappings/getTransfersResponse.ds"))
                 .setBody(simple("${body.content}"))
                 .marshal().json()
+                .endDoTry()
 
                 /*
                  * END processing
@@ -101,6 +113,8 @@ public class TransfersRouter extends RouteBuilder {
                         "'Final Response: ${body}', " +
                         "null, null, 'Response of GET /transfers/${header.transferId} API')")
 
+		        .doCatch(CCCustomException.class, HttpOperationFailedException.class, JSONException.class)	
+                    .to("direct:extractCustomErrors")
                 .doFinally().process(exchange -> {
             ((Histogram.Timer) exchange.getProperty(TIMER_NAME_GET)).observeDuration(); // stop Prometheus Histogram metric
         }).end()
